@@ -50,6 +50,7 @@ class MailgunBackend(BaseEmailBackend):
                       for addr in email_message.recipients()]
 
         try:
+            print email_message.message().body
             r = requests.\
                 post(self._api_url + "messages.mime",
                      auth=("api", self._access_key),
@@ -58,11 +59,12 @@ class MailgunBackend(BaseEmailBackend):
                             "from": from_email,
                          },
                      files={
-                            "message": ('message', email_message.message().as_string()),
+                            "message": ('message', email_message.message().body),
                          }
                      )
             print r.text
-        except:
+        except Exception, e:
+            print "EXCEPTION SENDING MAIL", e
             if not self.fail_silently:
                 raise
             return False
